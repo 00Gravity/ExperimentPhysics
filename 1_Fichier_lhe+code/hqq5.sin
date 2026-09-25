@@ -1,0 +1,58 @@
+model = SM_CKM
+
+mH = 126 GeV
+ms = 0
+mc = 0
+mb = 0
+
+alias qz = d:u:s:c:b
+alias Qz = D:U:S:C:B
+
+process hqq = e1, E1 => H, qz, Qz 
+
+compile()
+
+?allow_decays = true
+
+?ps_fsr_active = false
+?hadronization_active = false
+?ps_isr_active = false
+#?ps_use_PYTHIA_shower = true
+
+#?ps_PYTHIA_verbose = false
+
+sqrts = 380.0
+
+plot mrecmz {
+$title = "ff recoil mass and Z mass"
+} 
+
+plot pxpyq {
+$title = "px and py of q "
+} 
+plot pzEq {
+$title = "pz and E of q "
+} 
+plot pxpyQ {
+$title = "px and py of Q "
+} 
+plot pzEQ {
+$title = "pz and E of Q "
+} 
+
+beams = e1, E1
+
+cuts = all Pt > 5 GeV [qz,Qz]
+     and all 10 degree < Theta < 170 degree [qz,Qz]
+
+analysis = record mrecmz ( sqrt( (sqrts^2) + ((eval M [combine [qz,Qz]])^2) - (2*sqrts*eval E [combine [qz,Qz]])) , eval M [combine [qz,Qz]]) ; record pxpyq (eval Px [qz] , eval Py [qz]); record pzEq (eval Pz [qz],eval E [qz]); record pxpyQ (eval Px [Qz],eval Py [Qz]);record pzEQ (eval Pz [Qz],eval E [Qz])
+
+integrate (hqq) { iterations = 10:10000 }
+
+
+n_events = 500
+sample_format = lhef
+simulate(hqq) {}
+
+compile_analysis 
+
